@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+
+<!--头部导航栏-->
+<div class="container" th:fragment="topbar">
+    <div class="logo" >
+        <a th:href="@{/welcome}">教具管理系统后台</a></div>
+    <div class="left_open">
+        <a><i title="展开左侧栏" class="iconfont">&#xe699;</i></a>
+    </div>
+    <ul class="layui-nav left fast-add" lay-filter="">
+        <li class="layui-nav-item">
+            <a href="javascript:;">+新增</a>
+            <dl class="layui-nav-child">
+                <!-- 二级菜单 -->
+                <dd>
+                    <a onclick="xadmin.open('最大化','http://www.baidu.com','','',true)">
+                        <i class="iconfont">&#xe6a2;</i>弹出最大化</a></dd>
+                <dd>
+                    <a onclick="xadmin.open('弹出自动宽高','http://www.baidu.com')">
+                        <i class="iconfont">&#xe6a8;</i>弹出自动宽高</a></dd>
+                <dd>
+                    <a onclick="xadmin.open('弹出指定宽高','http://www.baidu.com',500,300)">
+                        <i class="iconfont">&#xe6a8;</i>弹出指定宽高</a></dd>
+                <dd>
+                    <a onclick="xadmin.add_tab('在tab打开','member-list.html')">
+                        <i class="iconfont">&#xe6b8;</i>在tab打开</a></dd>
+                <dd>
+                    <a onclick="xadmin.add_tab('在tab打开刷新','member-del.html',true)">
+                        <i class="iconfont">&#xe6b8;</i>在tab打开刷新</a></dd>
+            </dl>
+        </li>
+    </ul>
+    <ul class="layui-nav right" lay-filter="">
+        <li class="layui-nav-item">
+            <a>[[${session.LoginUser.getUserName()}]]</a>
+            <dl class="layui-nav-child">
+                <!-- 二级菜单 -->
+                <dd>
+                    <a onclick="xadmin.open('个人信息','http://www.baidu.com')">个人信息</a></dd>
+                <dd>
+                    <a onclick="xadmin.open('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
+                <dd>
+                    <a th:href="@{/admin}">退出</a></dd>
+            </dl>
+        </li>
+        <li class="layui-nav-item to-index">
+            <a href="/">前台首页</a></li>
+    </ul>
+</div>
+
+
+
+
+<!--侧边栏-->
+<div class="left-nav" th:fragment="sidebar">
+    <div id="side-nav">
+        <ul id="nav">
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont left-nav-li" lay-tips="教师管理">&#xe6b8;</i>
+                    <cite>教师管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu">
+                    <li>
+                        <a th:href="@{/teacher/initPage}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>教师列表</cite></a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont left-nav-li" lay-tips="教具管理">&#xe723;</i>
+                    <cite>教具管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu">
+                    <li>
+                        <a th:href="@{/toy/initPage}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>教具列表</cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont left-nav-li" lay-tips="分类管理">&#xe723;</i>
+                    <cite>分类管理</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu">
+                    <li>
+                        <a th:href="@{/findAllToyType}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>教具类型</cite></a>
+                    </li>
+                    <li>
+                        <a th:href="@{/toAdd}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>添加教具类型</cite></a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont left-nav-li" lay-tips="教具借还">&#xe6ce;</i>
+                    <cite>教具借还</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu">
+                    <li>
+                        <a th:href="@{/borrowRecord/getAllRecord}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>教具流水记录</cite></a>
+                    </li>
+                    <li>
+                        <a th:href="@{/borrowRecord/initPage}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>借教具</cite></a>
+                    </li>
+
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont left-nav-li" lay-tips="个人中心">&#xe6ce;</i>
+                    <cite>个人中心</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu">
+                    <li>
+                        <a th:href="@{/personal/myApprove}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>我的申请</cite></a>
+                    </li>
+                    <li>
+                        <a th:href="@{/personal/waitApprove}">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>待我审批</cite></a>
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+
+</html>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.WorkflowNodeMapper">
+
+    <resultMap id="resultMap" type="com.chen.pojo.WorkflowNode">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="node_type" property="nodeType"/>
+        <result column="process_id" property="processId"/>
+        <result column="next_node_id" property="nextNodeId"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        id,name,node_type,process_id,next_node_id,created_time,modify_time,status
+    </sql>
+
+    <sql id="dynamicWhere">
+        <if test="name != null">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="nodeType != null">
+            and node_type = #{nodeType}
+        </if>
+        <if test="processId != null">
+            and process_id = #{processId}
+        </if>
+        <if test="nextNodeId != null">
+            and next_node_id = #{nextNodeId}
+        </if>
+    </sql>
+
+    <select id="queryForList" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from workflow_node
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="queryForObject" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from workflow_node
+        where id = #{id}
+    </select>
+
+    <select id="queryProcessStartNode" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from workflow_node
+        where process_id = #{processId}
+            and node_type = 0
+    </select>
+
+    <insert id="insert" parameterType="com.chen.pojo.WorkflowNode" keyProperty="id" useGeneratedKeys="true">
+        insert into workflow_node (name,node_type,process_id,next_node_id,created_time,modify_time,status)
+        values (
+                #{name},
+                #{nodeType},
+                #{processId},
+                #{nextNodeId},
+                now(),
+                now(),
+                0
+               )
+    </insert>
+
+</mapper>
+
+

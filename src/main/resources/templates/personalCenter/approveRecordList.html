@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>待我审批</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/xadmin.css">
+    <link rel="stylesheet" href="/lib/layui/css/layui.css">
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+</head>
+
+<body>
+<div th:replace="~{commons/common::topbar}"></div>
+<div th:replace="~{commons/common::sidebar}"></div>
+<div class="layui-fluid" style="margin-top: auto;margin-left: 230px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                    <table class="layui-table layui-form" th:fragment="approve_data" id="id_approve_data">
+                        <input type="hidden" th:value="${approveRecordList.getTotal()}" id="total_count"/>
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>申请记录</th>
+                            <th>下一审批节点</th>
+                            <th>审核状态</th>
+                            <th>申请时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody th:each="lists:${approveRecordList.getList()}">
+                        <tr>
+                            <td th:text="${lists.getId()}"></td>
+                            <td th:text="${lists.getApplyId()}"></td>
+                            <td th:text="${lists.getNextNode()}"></td>
+                            <td th:text="${lists.getApproveStatus()}"></td>
+                            <td th:text="${lists.getCreatedTime()}"></td>
+                            <td>
+                                <a class="layui-btn layui-btn-danger" th:href="@{/approve/pass/}+${lists.getApplyId()}+'/'+${lists.getId()}">
+                                    <i class="layui-icon">&#xe640;</i>同意
+                                </a>
+                                <a class="layui-btn layui-btn-success" th:href="@{/approve/reject/}+${lists.getApplyId()}+'/'+${lists.getId()}">
+                                    <i class="layui-icon">&#xe642;</i>驳回
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="layui-card-body ">
+                    <div id="demo0"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" th:inline="javascript">
+
+    $(function () {
+        // 初始化教具筛选
+        //  getAllToyType();
+        initPage();
+    });
+    console.log("+++++++++++");
+
+    function initPage() {
+        let totalCount = $("#total_count").val();
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+                , layer = layui.layer;
+
+            //总页数低于页码总数
+            laypage.render({
+                elem: 'demo0'
+                , count: totalCount
+                , jump: function (obj, first) {
+                    //模拟渲染
+                    if (!first) {
+                        var pageNum = obj.curr;
+                        var pageSize = obj.limit;
+                        $.ajax({
+                            url: "/personal/waitApprove",
+                            data: {
+                                'pageNum': pageNum,
+                                'pageSize': pageSize
+                            }, success: function (reslut) {
+                                $("#id_approve_data").html(reslut);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+</script>
+
+
+</html>
+
+<style>
+    #typeSelect {
+        font-size: 12px;
+        height: 30px;
+        background: #009688;
+        color: #FFFFFF;
+    }
+</style>

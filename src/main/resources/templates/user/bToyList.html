@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>教具类型</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/xadmin.css">
+    <script src="/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/js/xadmin.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+</head>
+
+<body>
+<div th:replace="~{commons/common::topbar}"></div>
+<div th:replace="~{commons/common::sidebar}"></div>
+<div class="layui-fluid" style="margin-top: auto;margin-left: 230px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <div class="layui-card-header">
+                        <div class="layui-input-inline">
+                            <label class="layui-form-label"><span class="x-red">*</span>教具类型</label>
+                            <select name="typeId" id="typeSelect">
+                                <option th:each="type:${types}" th:value="${type.getId()}" th:text="${type.getTypename()}"></option>
+                            </select>
+                            <input id="input_test" style="height: 25px" value="111"/>
+                        </div>
+                        <div class="layui-inline layui-show-xs-block">
+                            <button class="layui-btn"  lay-submit="" lay-filter="sreach" onclick="queryToyByType()">
+                                <i class="layui-icon">&#xe615;</i>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="layui-table layui-form" th:fragment="toy_data" id="id_toy_data">
+                        <input type="hidden" th:value="${toyList.getTotal()}" id="total_count"/>
+                        <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>教具类型ID</th>
+                            <th>教具类型名称</th>
+                            <th>教具名称</th>
+                            <th>库存</th>
+                            <th>图片信息</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody th:each="lists:${toyList.getList()}">
+                        <tr>
+                            <td th:text="${lists.getId()}"></td>
+                            <td th:text="${lists.getTypeId()}"></td>
+                            <td th:text="${lists.getTypename()}"></td>
+                            <td th:text="${lists.getToyName()}"></td>
+                            <td th:text="${lists.getToyNum()}"></td>
+                            <td>
+                                <img th:src="'/images/'+${lists.getPicture()}" style="height: 50px;width: 50px;display: block;">
+                            </td>
+                            <td>
+                                <a class="layui-btn layui-btn-sm" th:onclick="'borrowToy(' + ${lists.getId()} + ')'">借教具</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="layui-card-body ">
+                    <div id="demo0" ></div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript" th:inline="javascript">
+
+    $(function () {
+        // 初始化教具筛选
+        //  getAllToyType();
+        initPage();
+    });
+    console.log("+++++++++++");
+
+    function initPage() {
+        let totalCount = $("#total_count").val();
+        layui.use(['laypage', 'layer'], function () {
+            var laypage = layui.laypage
+                , layer = layui.layer;
+
+            //总页数低于页码总数
+            laypage.render({
+                elem: 'demo0'
+               //, count: [[${toyList.getTotal()}]] //数据总数
+                , count: totalCount
+                , jump: function (obj, first) {
+                    //模拟渲染
+                    if (!first) {
+                        var pageNum = obj.curr;
+                        var pageSize = obj.limit;
+                        $.ajax({
+                            url: "/borrowRecord/findList", type: "POST",
+                            data: {
+                                'pageNum': pageNum,
+                                'pageSize': pageSize
+                            }, success: function (reslut) {
+                                $("#id_toy_data").html(reslut);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+
+    function queryToyByType() {
+        let typeId = $("#typeSelect").val();
+        console.log(typeId)
+        $.ajax({url:"/borrowRecord/findList" , type: "POST",
+            data:{
+                'typeId': typeId
+            },success:function(reslut) {
+                console.log(reslut);
+                $("#id_toy_data").html(reslut);
+                initPage();
+                let totalCount = $("#total_count").val();
+                console.log(totalCount)
+        }});
+    }
+
+    function borrowToy(id) {
+        console.log(id);
+        const inputHtml = '<div class="layui-layer-content"><div class="content"><input type="text" id="borrow_' + id + '" placeholder="请输入数量" name="btoyNum" style="height: 25px"></<br>' +
+                            '<div class="Msg"><p style="color: red" id="errorMsg_' + id + '"></p></div></div></div>';
+        layer.open({
+            type : 1,
+            title : "借教具",// 弹窗名字
+            offset : '200px' // 整体弹窗距离顶端位置
+            ,
+            id : id// 防止重复弹出
+            ,
+            content : inputHtml,
+            area : [ '450px', 'auto' ],// 弹窗面积大小设置
+            btn : [ '确定', '关闭' ],// 弹窗下方按钮设置
+
+            closeBtn : 0,// 不显示右上角关闭按钮
+            btnAlign : 'c' // 按钮居中
+            ,
+            shade : 0 // 不显示遮罩
+            ,
+            yes:function () {
+                var btoyNum = $("#borrow_" + id).val();// 获取input文本框的值
+                console.log(btoyNum)
+                $.ajax({
+                    url: "/borrowRecord/borrowToy", type: 'POST',
+                    data: {
+                        'id': id,
+                        'btoyNum': btoyNum
+                    },
+                    success: function (result) {
+                        if (result == -1) {
+                            $("#errorMsg_" + id).text("库存不足,操作失败！");
+                        } else {
+                            layer.closeAll();
+                            window.location.reload();  // 刷新页面，清空页面所有动态添加设置
+                            alert("借教具成功！")
+                        }
+
+                       // $("#id_toy_data").html(result);
+
+                    },
+                   /* error:function (result) {
+                        // alert('库存不足')
+                        $("#errorMsg_" + id).text("库存不足,操作失败！");
+                        // layer.closeAll();
+                        console.log("@@@",result);
+                    }*/
+                })
+            }
+
+
+        })
+
+    }
+
+</script>
+
+
+</html>
+<style>
+    #typeSelect {
+        font-size: 12px;
+        height: 30px;
+        background: #009688;
+        color: #FFFFFF;
+    }
+    .layui-layer-content{
+        height: 72px;
+    }
+    .Msg{
+        margin-top: 5px;
+    }
+    .content{
+        height: 60px;
+        margin-left: 150px;
+        margin-top: 10px;
+    }
+</style>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>借还流水表</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" href="/css/font.css">
+        <link rel="stylesheet" href="/css/xadmin.css">
+        <script src="/lib/layui/layui.js" charset="utf-8"></script>
+        <script type="text/javascript" src="/js/xadmin.js"></script>
+    </head>
+    <body>
+    <div th:replace="~{commons/common::topbar}"></div>
+    <div th:replace="~{commons/common::sidebar}"></div>
+        <div class="layui-fluid" style="margin-top: auto;margin-left: 230px;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body ">
+                            <table class="layui-table layui-form">
+                              <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>教具Id</th>
+                                    <th>教师ID</th>
+                                    <th>教师姓名</th>
+                                    <th>教具名称</th>
+                                    <th>借出数量</th>
+                                    <th>图片信息</th>
+                                    <th>借出时间</th>
+                                    <th>归还时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                              </thead>
+                              <tbody th:each="record:${list}">
+                                <tr>
+                                    <td th:text="${record.getId()}"></td>
+                                    <td th:text="${record.getToyId()}"></td>
+                                    <td th:text="${record.getUserId()}"></td>
+                                    <td th:text="${record.getUserName()}"></td>
+                                    <td th:text="${record.getToyName()}"></td>
+                                    <td th:text="${record.getBtoyNum()}"></td>
+                                    <td>
+                                        <img th:src="'/images/'+${record.getPicture()}" style="height: 50px;width: 50px;display: block;">
+                                    </td>
+                                    <td th:text="${#dates.format(record.getBdate(),'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <td th:text="${#dates.format(record.getRdate(),'yyyy-MM-dd HH:mm:ss')}"></td>
+                                    <!--<td th:text="${@FormatterUtils.borrowStateFormatter(record.getState())}"></td>-->
+                                    <td th:text="${record.getState()}"></td>
+                                    <td>
+                                        <input  style="width: 60px;height: 25px" type="button" th:disabled="${record.getState()==1?'false':'true' }" th:class="${record.getState()==1?'layui-btn':'layui-btn-warn'}"
+                                                th:onclick="'returnToy('+${record.getId()}+','+${record.getBtoyNum()}+','+${record.getToyId()}+')'" value="归还">
+                                    </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </body>
+    <script>
+        function returnToy(id,btoyNum,toyId) {
+            console.log(id,btoyNum,toyId);
+            $.ajax({
+                url:"/borrowRecord/returnToy", type:"POST",
+                data: {
+                    'id': id,
+                    'btoyNum': btoyNum,
+                    'toyId': toyId
+
+                },success(result){
+                    console.log(result);
+                    window.location.reload();  // 刷新页面，清空页面所有动态添加设置
+                }
+            })
+        }
+
+    </script>
+</html>

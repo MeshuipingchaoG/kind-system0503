@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.WaterListMapper">
+    <select id="getAll" resultType="com.chen.pojo.BorrowRecord" parameterType="Integer">
+        SELECT w.id,w.toy_id,user_id,user_name,toyName,btoy_num,picture,bdate,rdate,state
+        FROM waterlist AS w
+        INNER JOIN toylist AS t
+        ON w.toy_id = t.id
+        INNER JOIN teacher AS a
+        ON w.user_id = a.id
+        <if test="userId != null">
+            where w.user_id = #{userId}
+        </if>
+    </select>
+
+
+    <insert id="addRecord" parameterType="com.chen.pojo.BorrowRecord" keyProperty="id" useGeneratedKeys="true">
+        insert into waterlist (toy_id, user_id, btoy_num, bdate, state)
+        values (#{toyId}, #{userId}, #{btoyNum}, #{bdate}, #{state})
+    </insert>
+
+    <insert id="returnToy" parameterType="com.chen.pojo.BorrowRecord">
+        insert into waterlist (rdate) values (# {rdate})
+    </insert>
+
+    <select id="queryRecordById" resultType="com.chen.pojo.BorrowRecord">
+        select * from waterlist where id = #{id}
+    </select>
+
+    <update id="updateRecord" parameterType="com.chen.pojo.BorrowRecord">
+        update waterlist set rdate = #{rdate}, state = #{state} where id = #{id}
+    </update>
+
+    <select id="getRecordCount" parameterType="com.chen.pojo.query.BorrowRecordQry" resultType="Integer">
+        select count(*) from toylist
+    </select>
+
+</mapper>

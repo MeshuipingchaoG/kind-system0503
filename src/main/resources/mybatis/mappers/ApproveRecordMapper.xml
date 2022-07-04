@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.ApproveRecordMapper">
+
+    <resultMap id="resultMap" type="com.chen.pojo.ApproveRecord">
+        <result column="id" property="id"/>
+        <result column="apply_id" property="applyId"/>
+        <result column="cur_node" property="curNode"/>
+        <result column="next_node" property="nextNode"/>
+        <result column="approver" property="approver"/>
+        <result column="approve_status" property="approveStatus"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <resultMap id="poMap" type="com.chen.pojo.ApproveRecordPO">
+        <result column="id" property="id"/>
+        <result column="apply_id" property="applyId"/>
+        <result column="cur_node" property="curNode"/>
+        <result column="next_node" property="nextNode"/>
+        <result column="approver" property="approver"/>
+        <result column="approve_status" property="approveStatus"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="status" property="status"/>
+        <result column="process_name" property="processName"/>
+        <result column="applicantName" property="applicantName"/>
+        <result column="applyTime" property="applyTime" jdbcType="DATE"/>
+        <result column="toyId" property="toyId"/>
+        <result column="toyName" property="toyName"/>
+        <result column="borrowNun" property="borrowNun"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        id,apply_id,cur_node,next_node,approver,approve_status,created_time,modify_time,status
+    </sql>
+
+    <sql id="dynamicWhere">
+        <if test="applyId != null">
+            and apply_id = #{applyId}
+        </if>
+        <if test="curNode != null">
+            and cur_node = #{curNode}
+        </if>
+        <if test="nextNode != null">
+            and next_node = #{nextNode}
+        </if>
+        <if test="approver != null">
+            and approver = #{approver}
+        </if>
+        <if test="approveStatus != null">
+            and approve_status = #{approveStatus}
+        </if>
+    </sql>
+
+    <select id="queryForList" resultMap="poMap">
+        select t1.*,
+            t2.process_name, t2.toyId, t2.toyName, t2.borrowNun, t2.created_time applyTime, t2.applicantName
+        from approve_record t1
+        left join (
+            select
+            a.id, a.applicant, a.created_time,
+            w.name as process_name,
+            l.toyId toyId, l.toyName toyName, l.borrowNun as borrowNun,
+            c.user_name applicantName
+            from apply_record a
+            left join workflow_process w on a.process_id = w.id
+            left join (
+                select w.id id, w.btoy_num borrowNun, t.id toyId, t.toyName toyName
+                from waterlist w
+                left join toylist t on w.toy_id = t.id
+            ) l on a.business_id = l.id
+            left join teacher c on a.applicant = c.id
+        ) t2 on t1.apply_id = t2.id
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="queryForCount" resultType="Integer">
+        select
+        count(*)
+        from approve_record
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="queryForObject" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from approve_record
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.chen.pojo.ApproveRecord">
+        insert into approve_record (apply_id,cur_node,next_node,approver,approve_status,created_time,modify_time,status)
+        values (
+                #{applyId},
+                #{curNode},
+                #{nextNode},
+                #{approver},
+                #{approveStatus},
+                now(),
+                now(),
+                0
+               )
+    </insert>
+    
+    <update id="update" parameterType="com.chen.pojo.ApproveRecord">
+        update approve_record
+        set
+            modify_time = now(),
+            <if test="approver != null">
+                approver = #{approver},
+            </if>
+            <if test="approveStatus != null">
+                approve_status = #{approveStatus}
+            </if>
+        where id = #{id}
+    </update>
+
+    <update id="approve" parameterType="com.chen.pojo.ApproveRecord">
+        update approve_record
+        set
+            modify_time = now(),
+            <if test="approver != null">
+                approver = #{approver},
+            </if>
+            <if test="approveStatus != null">
+                approve_status = #{approveStatus}
+            </if>
+        where apply_id = #{applyId}
+    </update>
+
+</mapper>
+
+

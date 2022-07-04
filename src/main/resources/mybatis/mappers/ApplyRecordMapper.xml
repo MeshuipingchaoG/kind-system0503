@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.ApplyRecordMapper">
+
+    <resultMap id="resultMap" type="com.chen.pojo.ApplyRecord">
+        <result column="id" property="id"/>
+        <result column="process_id" property="processId"/>
+        <result column="process_version" property="processVersion"/>
+        <result column="business_id" property="businessId"/>
+        <result column="applicant" property="applicant"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <resultMap id="poMap" type="com.chen.pojo.ApplyRecordPO">
+        <result column="id" property="id"/>
+        <result column="process_id" property="processId"/>
+        <result column="process_name" property="processName"/>
+        <result column="process_version" property="processVersion"/>
+        <result column="business_id" property="businessId"/>
+        <result column="applicant" property="applicant"/>
+        <result column="created_time" property="createdTime" jdbcType="DATE"/>
+        <result column="modify_time" property="modifyTime" jdbcType="DATE"/>
+        <result column="status" property="status"/>
+        <result column="toyId" property="toyId"/>
+        <result column="toyName" property="toyName"/>
+        <result column="borrowNun" property="borrowNun"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        id,process_id,process_version,business_id,applicant,created_time,modify_time,status
+    </sql>
+
+    <sql id="dynamicWhere">
+        <if test="processId != null">
+            and process_id = #{processId}
+        </if>
+        <if test="processVersion != null">
+            and process_version = #{processVersion}
+        </if>
+        <if test="businessId != null">
+            and business_id = #{businessId}
+        </if>
+        <if test="applicant != null">
+            and applicant = #{applicant}
+        </if>
+        <if test="createdTime != null">
+            and created_time = #{createdTime}
+        </if>
+    </sql>
+
+    <select id="queryForCount" resultType="Integer">
+        select
+        count(*)
+        from apply_record
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="applyCount" resultType="Integer" parameterType="String">
+        select
+        count(*)
+        from apply_record
+        where DATE_FORMAT(created_time, '%Y-%m-%d') = #{statisticsTime}
+    </select>
+
+   <!-- <select id="queryForList" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from apply_record
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>-->
+    <select id="queryForList" resultMap="poMap">
+        select
+        a.id, a.process_id, a.process_version, a.business_id, a.applicant, a.created_time, a.modify_time, a.status,
+        w.name as process_name,
+        l.toyId toyId, l.toyName toyName, l.borrowNun as borrowNun
+        from apply_record a
+        left join workflow_process w on a.process_id = w.id
+        left join (
+        select w.id id, w.btoy_num borrowNun, t.id toyId, t.toyName toyName
+        from waterlist w
+        left join toylist t on w.toy_id = t.id
+        ) l on a.business_id = l.id
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="queryForObject" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from apply_record
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.chen.pojo.ApplyRecord" keyProperty="id" useGeneratedKeys="true">
+        insert into apply_record (process_id,process_version,business_id,applicant,created_time,modify_time,status)
+        values (
+                #{processId},
+                #{processVersion},
+                #{businessId},
+                #{applicant},
+                now(),
+                now(),
+                0
+               )
+    </insert>
+
+</mapper>
+
+

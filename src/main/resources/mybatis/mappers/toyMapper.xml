@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.ToyMapper">
+
+    <select id="queryToyList" parameterType="com.chen.pojo.query.ToyQry" resultType="com.chen.pojo.Toy">
+        SELECT  a.id,a.typeId,typename,toyName,toyNum,picture
+        FROM toylist AS a
+        INNER JOIN toytypes AS b
+        ON a.typeId=b.id
+        WHERE 1=1
+        <if test="typeId != null">
+            AND typeId = #{typeId}
+        </if>
+    </select>
+
+    <delete id="deleteToy" parameterType="int">
+        delete from toylist where id = #{id}
+    </delete>
+
+
+    <update id="updateToy" parameterType="com.chen.pojo.Toy">
+        update toylist
+        <trim prefix="set" suffixOverrides=",">
+            <if test="typeId != null">
+                typeId = #{typeId},
+            </if>
+            <if test="toyName != null">
+                toyName = #{toyName},
+            </if>
+            <if test="toyNum != null">
+                toyNum = #{toyNum},
+            </if>
+            <if test="picture != null">
+                picture = #{picture},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <insert id="addToy" parameterType="com.chen.pojo.Toy">
+        insert into toylist (typeId,toyName,toyNum,picture) values (#{typeId},#{toyName},#{toyNum},#{picture} )
+    </insert>
+
+    <select id="queryToyById" resultType="com.chen.pojo.Toy">
+        select * from toylist where  id = #{id}
+    </select>
+
+   <!-- <select id="queryByTypeId" resultType="com.chen.pojo.Toy">
+        SELECT  a.id,a.typeId,typename,toyName,toyNum,picture
+        FROM toylist AS a
+        INNER JOIN toytypes AS b
+        ON a.typeId=b.id
+        WHERE typeId = #{typeId}
+    </select>-->
+    <select id="getToyCount" parameterType="com.chen.pojo.query.ToyQry" resultType="Integer">
+        select count(*) from toylist
+        where 1=1
+        <if test="toyName != null">
+            and toyName like concat ('%','${toyName}','%')
+        </if>
+    </select>
+
+</mapper>

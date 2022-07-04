@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.WorkflowProcessMapper">
+
+    <resultMap id="resultMap" type="com.chen.pojo.WorkflowProcess">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="summary" property="summary"/>
+        <result column="version" property="version"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        id,name,summary,version,created_time,modify_time,status
+    </sql>
+
+    <sql id="dynamicWhere">
+        <if test="name != null">
+            AND name LIKE CONCAT('%',#{name},'%')
+        </if>
+        <if test="summary != null">
+            and summary = #{summary}
+        </if>
+        <if test="version != null">
+            and version = #{version}
+        </if>
+    </sql>
+
+    <select id="queryForList" resultMap="resultMap" parameterType="com.chen.pojo.WorkflowProcess">
+        select
+        <include refid="allColumns"/>
+        from workflow_process
+        where 1 = 1
+        <include refid="dynamicWhere"/>
+    </select>
+
+    <select id="queryForObject" resultMap="resultMap">
+        select
+        <include refid="allColumns"/>
+        from workflow_process
+        where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.chen.pojo.WorkflowProcess">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into workflow_process (name,summary,version,created_time,modify_time,status)
+        values (
+                #{name},
+                #{summary},
+                0,
+                now(),
+                now(),
+                0
+               )
+    </insert>
+
+</mapper>
+
+

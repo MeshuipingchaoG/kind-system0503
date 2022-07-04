@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mapper.TeacherMapper">
+    
+    <select id="findAll" parameterType="com.chen.pojo.query.TeacherQry" resultType="com.chen.pojo.Teacher">
+        select * from teacher
+        where 1=1
+        <if test="userName != null">
+           and user_name like concat ('%','${userName}','%')
+        </if>
+    </select>
+
+    <select id="getUserCount" parameterType="com.chen.pojo.query.TeacherQry" resultType="Integer">
+        select count(*) from teacher
+        where 1=1
+        <if test="userName != null">
+            and user_name like concat ('%','${userName}','%')
+        </if>
+    </select>
+    
+    <insert id="addTeacher" parameterType="com.chen.pojo.Teacher">
+        insert into teacher(id,user_name,user_pwd,phone, role)
+        values (#{id},#{userName},#{userPwd},#{phone},#{role})
+    </insert>
+    
+    <delete id="deleteTeacher" parameterType="int">
+        delete from teacher where id = #{id}
+    </delete>
+
+    <select id="queryTeaById" resultType="com.chen.pojo.Teacher">
+        select * from teacher where id = #{id}
+    </select>
+
+    <update id="updateTeacher" parameterType="com.chen.pojo.Teacher">
+        update teacher set user_name = #{userName},user_pwd = #{userPwd},phone = #{phone} where id = #{id}
+    </update>
+
+   <!-- <select id="queryByName" resultType="com.chen.pojo.Teacher">
+        select id,user_name,user_pwd,phone
+        from teacher
+        where user_name like concat ('%','${userName}','%')
+    </select>-->
+    <select id="loginList" resultType="com.chen.pojo.Teacher">
+        select * from teacher where user_name = #{userName} and user_pwd = #{userPwd}
+    </select>
+</mapper>
