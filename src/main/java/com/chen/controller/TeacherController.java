@@ -73,5 +73,6 @@ public class TeacherController {
         System.out.println("模糊查询"+teachers);
         model.addAttribute("teaList",teachers);
         return "/admin/teacher-list :: teacher_info";
+        陈志威牛逼
     }*/
 }
