@@ -74,5 +74,6 @@ public class TeacherController {
         model.addAttribute("teaList",teachers);
         return "/admin/teacher-list :: teacher_info";
         陈志威牛逼
+        三生三世
     }*/
 }
